@@ -1,0 +1,25 @@
+{
+  "name": "model-routing-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "route": "node --import tsx src/cli.ts route",
+    "tasks": "node --import tsx src/cli.ts list",
+    "smoke": "node --import tsx src/cli.ts smoke",
+    "execute": "node --import tsx src/cli.ts run",
+    "benchmark": "node --import tsx src/cli.ts benchmark",
+    "validator:build": "docker build -f Dockerfile.validator -t model-routing-validator:local .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run src"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0"
+  }
+}

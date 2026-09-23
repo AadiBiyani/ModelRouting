@@ -1,0 +1,7 @@
+{
+  "id": "is-palindrome",
+  "kind": "refactor",
+  "prompt": "Refactor the provided isPalindrome function to avoid building a reversed copy of the normalized string. Preserve its behavior: lowercase the input, retain only characters matching [a-z0-9], and compare the remaining sequence with its reverse. An empty normalized string is a palindrome. Keep the exported signature.",
+  "context": ["export function isPalindrome(text: string): boolean {\n  const normalized = text.toLowerCase().split(\"\").filter((char) => /[a-z0-9]/.test(char)).join(\"\");\n  return normalized === normalized.split(\"\").reverse().join(\"\");\n}"],
+  "signature": "export function isPalindrome(text: string): boolean"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "merge-sorted",
+  "kind": "implement",
+  "prompt": "Implement mergeSorted(left, right). Both input arrays are sorted in ascending numeric order. Return a new ascending array containing every element from both inputs, including duplicates. Do not mutate either input.",
+  "context": [],
+  "signature": "export function mergeSorted(left: number[], right: number[]): number[]"
+}

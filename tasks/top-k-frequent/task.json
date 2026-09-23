@@ -1,0 +1,7 @@
+{
+  "id": "top-k-frequent",
+  "kind": "implement",
+  "prompt": "Implement topKFrequent(values, k). Return up to k distinct numbers ranked by descending occurrence count. Break ties by the number's first appearance in the input. Return an empty array when k is zero. Do not mutate the input.",
+  "context": [],
+  "signature": "export function topKFrequent(values: number[], k: number): number[]"
+}

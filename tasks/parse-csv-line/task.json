@@ -1,0 +1,7 @@
+{
+  "id": "parse-csv-line",
+  "kind": "implement",
+  "prompt": "Implement parseCsvLine(line) for one valid CSV record. Commas outside double-quoted fields separate fields. A quoted field may contain commas, and two consecutive double quotes inside a quoted field represent one literal quote. Preserve whitespace and empty fields. Assume the input is a valid single record with no line breaks.",
+  "context": [],
+  "signature": "export function parseCsvLine(line: string): string[]"
+}

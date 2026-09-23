@@ -1,0 +1,7 @@
+{
+  "id": "count-words",
+  "kind": "debug",
+  "prompt": "Fix the provided countWords function. Count nonempty words separated by any whitespace. Empty or whitespace-only input must return zero. Keep the same exported function signature.",
+  "context": ["export function countWords(text: string): number {\n  return text.split(\" \").length;\n}"],
+  "signature": "export function countWords(text: string): number"
+}

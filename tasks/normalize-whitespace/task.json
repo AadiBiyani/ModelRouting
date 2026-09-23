@@ -1,0 +1,7 @@
+{
+  "id": "normalize-whitespace",
+  "kind": "implement",
+  "prompt": "Implement normalizeWhitespace(text). Remove leading and trailing whitespace, and replace every internal run of spaces, tabs, or line breaks with one ordinary space. Return the resulting string.",
+  "context": [],
+  "signature": "export function normalizeWhitespace(text: string): string"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "unique-numbers",
+  "kind": "implement",
+  "prompt": "Implement uniqueNumbers(values) to remove duplicate numbers while preserving the order of their first appearance. Return a new array and do not mutate the input.",
+  "context": [],
+  "signature": "export function uniqueNumbers(values: number[]): number[]"
+}

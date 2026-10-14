@@ -1,0 +1,7 @@
+{
+  "id": "chunk-array",
+  "kind": "debug",
+  "prompt": "Fix the provided chunk function. It should split values into consecutive groups of size items, in their original order. When the number of values is not a multiple of size, the final group contains the remaining values. Empty input returns an empty array. size is always a positive integer. Do not mutate the input. Keep the same exported function signature.",
+  "context": ["export function chunk(values: number[], size: number): number[][] {\n  const result: number[][] = [];\n  for (let start = 0; start + size <= values.length; start += size) {\n    result.push(values.slice(start, start + size));\n  }\n  return result;\n}"],
+  "signature": "export function chunk(values: number[], size: number): number[][]"
+}

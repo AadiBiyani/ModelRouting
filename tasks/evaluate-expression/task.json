@@ -1,0 +1,7 @@
+{
+  "id": "evaluate-expression",
+  "kind": "implement",
+  "prompt": "Implement evaluate(expression) to compute the value of an arithmetic expression string. Numbers are non-negative decimal literals: one or more digits, optionally followed by a decimal point and one or more digits (for example 3, 0.5, 12.25). Supported operators are binary +, -, *, /, and ^ (exponentiation), unary minus, and parentheses. Whitespace between tokens is ignored. Precedence from highest to lowest: ^, then unary minus, then * and /, then binary + and -. The ^ operator is right-associative, and its right operand may itself start with unary minus, so 2 ^ 3 ^ 2 is 512, -2 ^ 2 is -4, and 2 ^ -1 is 0.5. Unary minus may be repeated, so --3 is 3. The binary operators +, -, *, and / are left-associative. Throw an Error for any invalid expression, including empty input, an unexpected character, a missing operand, unbalanced parentheses, or extra tokens after a complete expression.",
+  "context": [],
+  "signature": "export function evaluate(expression: string): number"
+}

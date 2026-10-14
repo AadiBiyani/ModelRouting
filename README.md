@@ -42,7 +42,7 @@ The route's 6,000-character threshold is a heuristic over the prompt and support
 
 ## Task set and review
 
-The seven task definitions live under `tasks/`. Each task's `solution.test.ts` file was written before any model-generated solution was run. [Task review notes](docs/task-review.md) summarize the expected behavior and covered cases. Review the prompts and tests before running a benchmark; changing them afterward makes results from different runs incomparable.
+The eleven task definitions live under `tasks/`. Each task's `solution.test.ts` file was written before any model-generated solution was run. [Task review notes](docs/task-review.md) summarize the expected behavior and covered cases. Review the prompts and tests before running a benchmark; changing them afterward makes results from different runs incomparable.
 
 Passing means TypeScript compiled the candidate and Vitest passed these predefined checks. The checks cannot prove general correctness or refactoring quality. The benchmark is small, so its success rates are descriptive rather than a statistical equivalence claim.
 

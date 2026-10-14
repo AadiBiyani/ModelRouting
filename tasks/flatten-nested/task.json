@@ -1,0 +1,7 @@
+{
+  "id": "flatten-nested",
+  "kind": "refactor",
+  "prompt": "Refactor the provided flatten function so it does not use recursion. The recursive version overflows the call stack on deeply nested input. Use a loop instead, for example with an explicit stack. Preserve its behavior: return a new array containing every number in its original left-to-right order, skip empty arrays, and do not mutate the input. Keep the exported Nested type and the same exported function signature.",
+  "context": ["export type Nested = number | Nested[];\n\nexport function flatten(values: Nested[]): number[] {\n  const result: number[] = [];\n  for (const value of values) {\n    if (Array.isArray(value)) {\n      result.push(...flatten(value));\n    } else {\n      result.push(value);\n    }\n  }\n  return result;\n}"],
+  "signature": "export function flatten(values: Nested[]): number[]"
+}

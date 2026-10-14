@@ -2,7 +2,7 @@
 
 This TypeScript CLI tests a narrow question from the Adaptive Execution Optimizer project: can simple routing reduce cloud-model calls on single-function coding tasks while preserving success on predefined checks?
 
-Each task has a prompt, category, supporting code, fixed function signature, and separately written tests. The router sends small implementation tasks to Ollama and debugging, refactoring, or longer tasks to Anthropic. If a local attempt fails generation or validation, one cloud attempt receives the original task plus a brief diagnostic. There is never more than one attempt per provider for a task.
+Each task has a prompt, category, supporting code, fixed function signature, and separately written tests. Before any model call, the router sends a task to Anthropic if it would not fit in the local model's context window or if it scores as too complex; everything else, including simple debugging and refactoring tasks, goes to Ollama first. If a local attempt fails generation or validation, one cloud attempt receives the original task plus a brief diagnostic. There is never more than one attempt per provider for a task.
 
 ## Requirements
 
@@ -38,7 +38,13 @@ npm test
 
 `route` explains the routing decision without calling a model. `smoke` confirms a real provider request and prints its response without executing the generated code. `execute` runs one task. `benchmark` runs every task under local-only, cloud-only, and routed policies, then writes `results/report.md`. Every execution attempt is appended to `results/attempts.jsonl`, including failures. Both files are ignored by Git until you choose which evidence to publish.
 
-The route's 6,000-character threshold is a heuristic over the prompt and supporting code. It is not the local model's context limit. Change it with `MAX_LOCAL_CHARS`.
+The router applies three checks in order, and `route` prints the scores behind each decision:
+
+1. **Capacity.** The full prompt is estimated at one token per three characters. If that estimate plus `LOCAL_OUTPUT_RESERVE_TOKENS` (default 2048) exceeds `LOCAL_CONTEXT_TOKENS` (default 4096), the task goes to the cloud. The same context size is sent to Ollama as `num_ctx`, so the router's assumption matches the window the local model actually uses.
+2. **Specification score.** The prompt's count of rule words (such as "precedence", "unless", "invalid", "must") plus worked examples (such as "2 ^ 3 is 8"). Above `MAX_LOCAL_SPEC_SCORE` (default 8), the task goes to the cloud.
+3. **Code complexity score.** For debugging and refactoring tasks only, the supplied code's decision points (`if`, loops, `case`, `catch`, `&&`, `||`, ternaries) plus its deepest brace nesting, ignoring comments and strings. Above `MAX_LOCAL_CODE_SCORE` (default 8), the task goes to the cloud. Supporting code for implementation tasks counts toward capacity but not complexity, because it is reference material rather than code to change.
+
+The default limits were calibrated on the current task set, so treat them as starting points and check them against new tasks. Routed results from benchmarks run before this routing change are not comparable with later ones. A benchmark report also includes an `ideal (hindsight)` row: the cost and success the batch would have had if every task had gone to the right model, which measures how much room the router leaves.
 
 ## Task set and review
 

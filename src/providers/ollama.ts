@@ -14,6 +14,7 @@ export class OllamaProvider implements CodeProvider {
     public readonly modelName: string,
     private readonly baseUrl = "http://localhost:11434",
     private readonly timeoutMs = 120_000,
+    private readonly contextTokens = 4096,
   ) {}
 
   async generate(task: Task, diagnostic?: string): Promise<GeneratedCode> {
@@ -24,7 +25,8 @@ export class OllamaProvider implements CodeProvider {
       body: JSON.stringify({
         model: this.modelName,
         stream: false,
-        options: { temperature: 0 },
+        // Matches the context window the router assumes when checking capacity.
+        options: { temperature: 0, num_ctx: this.contextTokens },
         messages: [{ role: "user", content: buildPrompt(task, diagnostic) }],
       }),
       signal: AbortSignal.timeout(this.timeoutMs),

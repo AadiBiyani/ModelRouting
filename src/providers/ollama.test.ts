@@ -30,6 +30,16 @@ describe("OllamaProvider", () => {
     const body = JSON.parse(String(request.body));
     expect(body.stream).toBe(false);
     expect(body.model).toBe("local-model");
+    expect(body.options).toEqual({ temperature: 0, num_ctx: 4096 });
     expect(body.messages[0].content).toContain("Existing helper code");
+  });
+
+  it("sends the configured context window", async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ message: { content: "x" } }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await new OllamaProvider("local-model", undefined, undefined, 8192).generate(task);
+    const [, request] = fetchMock.mock.calls[0] as unknown as [URL, RequestInit];
+    expect(JSON.parse(String(request.body)).options.num_ctx).toBe(8192);
   });
 });

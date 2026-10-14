@@ -1,7 +1,7 @@
 import { randomUUID, createHash } from "node:crypto";
 import { appendFile, mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
-import { route } from "./router.js";
+import { route, type RoutingOptions } from "./router.js";
 import type { Task } from "./task.js";
 import type { CodeProvider, GeneratedCode, ProviderName } from "./providers/types.js";
 import { validateGenerated, type ValidationResult, type ValidationStatus } from "./validate.js";
@@ -45,7 +45,7 @@ export type TaskRunResult = {
 
 export type RunOptions = {
   providers: Record<ProviderName, CodeProvider>;
-  maxLocalChars: number;
+  routing: RoutingOptions;
   cloudInputUsdPerMillion: number | null;
   cloudOutputUsdPerMillion: number | null;
   priceDate: string | null;
@@ -82,7 +82,7 @@ export async function runTask(task: Task, policy: Policy, options: RunOptions): 
   const started = performance.now();
   const runId = randomUUID();
   const batchId = options.batchId ?? randomUUID();
-  const decision = route(task, options.maxLocalChars);
+  const decision = route(task, options.routing);
   const routingReason = policy === "routed" ? decision.reason : `${policy} baseline`;
   const targets: ProviderName[] = policy === "local-only"
     ? ["local"]

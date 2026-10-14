@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { summarize } from "./benchmark.js";
+import { defaultRoutingOptions } from "./router.js";
 import { runTask, type RunOptions } from "./runner.js";
 import type { Task } from "./task.js";
 import type { CodeProvider, GeneratedCode } from "./providers/types.js";
@@ -32,7 +33,7 @@ async function withOptions(test: (options: RunOptions, cloudCalls: string[]) => 
   };
   const options: RunOptions = {
     providers: { local, cloud },
-    maxLocalChars: 6000,
+    routing: defaultRoutingOptions,
     cloudInputUsdPerMillion: 3,
     cloudOutputUsdPerMillion: 15,
     priceDate: "2026-09-22",
@@ -97,9 +98,20 @@ describe("runTask", () => {
     });
   });
 
-  it("routes a debugging task directly to cloud", async () => {
+  it("tries a simple debugging task locally before escalating", async () => {
     await withOptions(async (options, cloudCalls) => {
-      const result = await runTask({ ...task, kind: "debug" }, "routed", options);
+      const result = await runTask({ ...task, kind: "debug", context: ["export function f() { return 1; }"] }, "routed", options);
+      expect(result.attempts.map((attempt) => attempt.provider)).toEqual(["local", "cloud"]);
+      expect(cloudCalls).toEqual(["tests_failed: ordering assertion failed"]);
+    });
+  });
+
+  it("routes a complex debugging task directly to cloud", async () => {
+    await withOptions(async (options, cloudCalls) => {
+      options.routing = { ...defaultRoutingOptions, maxCodeScore: 1 };
+      const context = ["export function f(a: boolean) { if (a) { return 1; } return 0; }"];
+      const result = await runTask({ ...task, kind: "debug", context }, "routed", options);
+      expect(result.routingReason).toContain("Code complexity score");
       expect(result.attempts).toHaveLength(1);
       expect(result.attempts[0].provider).toBe("cloud");
       expect(cloudCalls).toEqual([""]);

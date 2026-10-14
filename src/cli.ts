@@ -34,7 +34,7 @@ function providersFor(config: Config, policy: Policy): Record<ProviderName, Code
   if (cloudNeeded && !config.anthropicApiKey) throw new Error("Set ANTHROPIC_API_KEY in .env");
   return {
     local: config.ollamaModel
-      ? new OllamaProvider(config.ollamaModel, config.ollamaBaseUrl, config.providerTimeoutMs)
+      ? new OllamaProvider(config.ollamaModel, config.ollamaBaseUrl, config.providerTimeoutMs, config.routing.contextTokens)
       : unavailable("OLLAMA_MODEL is not configured"),
     cloud: config.anthropicModel && config.anthropicApiKey
       ? new AnthropicProvider(config.anthropicModel, config.anthropicApiKey, config.providerTimeoutMs)
@@ -45,7 +45,7 @@ function providersFor(config: Config, policy: Policy): Record<ProviderName, Code
 function runOptions(config: Config, policy: Policy, batchId: string): RunOptions {
   return {
     providers: providersFor(config, policy),
-    maxLocalChars: config.maxLocalChars,
+    routing: config.routing,
     cloudInputUsdPerMillion: config.cloudInputUsdPerMillion,
     cloudOutputUsdPerMillion: config.cloudOutputUsdPerMillion,
     priceDate: config.priceDate,
@@ -69,7 +69,7 @@ async function main(): Promise<void> {
 
   if (command === "route" && taskId) {
     const task = await loadTask(taskId);
-    console.log(JSON.stringify({ taskId: task.id, ...route(task, readConfig().maxLocalChars) }, null, 2));
+    console.log(JSON.stringify({ taskId: task.id, ...route(task, readConfig().routing) }, null, 2));
     return;
   }
 

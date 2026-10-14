@@ -2,8 +2,10 @@ import type { Policy, TaskRunResult } from "./runner.js";
 
 export const policies: Policy[] = ["local-only", "cloud-only", "routed"];
 
+export const idealLabel = "ideal (hindsight)";
+
 export type PolicySummary = {
-  policy: Policy;
+  policy: Policy | typeof idealLabel;
   tasks: number;
   successes: number;
   successRate: number;
@@ -16,7 +18,22 @@ export type PolicySummary = {
 };
 
 export function summarize(policy: Policy, results: TaskRunResult[]): PolicySummary {
-  const selected = results.filter((result) => result.policy === policy);
+  return summarizeSelection(policy, results.filter((result) => result.policy === policy));
+}
+
+// Best achievable routing in this batch: local when the local-only baseline passed, otherwise cloud-only.
+export function summarizeIdeal(results: TaskRunResult[]): PolicySummary {
+  const taskIds = [...new Set(results.map((result) => result.taskId))];
+  const chosen = taskIds.flatMap((taskId) => {
+    const local = results.find((result) => result.taskId === taskId && result.policy === "local-only");
+    const cloud = results.find((result) => result.taskId === taskId && result.policy === "cloud-only");
+    const pick = local?.success ? local : cloud ?? local;
+    return pick ? [pick] : [];
+  });
+  return summarizeSelection(idealLabel, chosen);
+}
+
+function summarizeSelection(policy: PolicySummary["policy"], selected: TaskRunResult[]): PolicySummary {
   const attempts = selected.flatMap((result) => result.attempts);
   const cloudAttempts = attempts.filter((attempt) => attempt.provider === "cloud");
   const costs = attempts.map((attempt) => attempt.estimatedApiCostUsd);
@@ -45,7 +62,7 @@ function dollars(value: number | null): string {
 }
 
 export function formatReport(batchId: string, results: TaskRunResult[], priceDate: string | null): string {
-  const summaries = policies.map((policy) => summarize(policy, results));
+  const summaries = [...policies.map((policy) => summarize(policy, results)), summarizeIdeal(results)];
   const lines = [
     "# Model routing benchmark",
     "",
@@ -62,6 +79,8 @@ export function formatReport(batchId: string, results: TaskRunResult[], priceDat
   lines.push(
     "",
     "Cloud cost includes every attempt with reported token usage, including failed validation. Local inference has zero provider API fees; local compute cost is excluded. Costs are unavailable if cloud prices or token counts are missing.",
+    "",
+    `The ${idealLabel} row is not a policy that ran. It is computed after the fact from this batch by taking the local-only result for each task that passed locally and the cloud-only result otherwise, as a reference for how well routing could have done.`,
     "",
     "Passing means the implementation compiled and passed the predefined tests. These checks do not establish general correctness. This small benchmark describes observed outcomes and cannot establish statistical equivalence in success rate.",
     "",
